@@ -5,6 +5,8 @@ export interface Bot {
   instructions?: string;
   provider: string;
   model: string;
+  /** The brain's flat SVG face for this bot. */
+  avatar?: string;
   status?: "thinking" | "idle";
   /** Devices it can use: "owner" is its own. */
   computers?: { computerId: string; role: "owner" | "guest" }[];

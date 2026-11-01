@@ -1,3 +1,4 @@
+import { Avatar } from "./Avatar";
 import { useEffect, useRef, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -105,9 +106,12 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
   return (
     <section className={`chat ${dropping ? "dropping" : ""}`}>
       <header className="chat-head">
-        <div>
-          <div className="title">{bot.name}</div>
-          <div className="subtitle">{bot.model}</div>
+        <div className="chat-who">
+          <Avatar bot={bot} size={26} working={thinking} />
+          <div>
+            <div className="title">{bot.name}</div>
+            <div className="subtitle">{bot.model}</div>
+          </div>
         </div>
         <div className="actions">
           {thinking && <button className="pill" onClick={stop}>Stop</button>}
@@ -116,7 +120,9 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
       </header>
       <div className="messages">
         {messages.map((m) => <Bubble key={m.id} m={m} bot={bot} />)}
-        {thinking && <div className="typing">Working…</div>}
+        {thinking && messages[messages.length - 1]?.role !== "assistant" && (
+          <div className="bot-msg"><Avatar bot={bot} size={22} working /><div className="typing-dots"><i /><i /><i /></div></div>
+        )}
         <div ref={end} />
       </div>
       {error && <div className="chat-error">{error}</div>}
@@ -178,8 +184,10 @@ function Bubble({ m, bot }: { m: Message; bot: Bot }) {
     );
   }
   return (
-    <div className={`bubble bot ${m.error ? "failed" : ""}`}>
-      {m.text ? <Markdown text={m.text} /> : !m.error && !m.files?.length ? "…" : null}
+    <div className={`bot-msg ${m.error ? "failed" : ""}`}>
+      <Avatar bot={bot} size={22} />
+      <div className="bot-body">
+      {m.text ? <Markdown text={m.text} /> : !m.error && !m.files?.length ? <div className="typing-dots"><i /><i /><i /></div> : null}
       {m.files?.length ? <Files botId={m.botId} files={m.files} /> : null}
       {m.error && (
         <div className="error" onClick={() => setDetails((d) => !d)}>
@@ -187,6 +195,7 @@ function Bubble({ m, bot }: { m: Message; bot: Bot }) {
           {details && m.detail && <pre className="detail">{m.detail}</pre>}
         </div>
       )}
+      </div>
     </div>
   );
 }
