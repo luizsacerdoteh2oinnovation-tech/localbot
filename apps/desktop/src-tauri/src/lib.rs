@@ -41,8 +41,8 @@ fn launch_command(app: &AppHandle) -> Result<Command, String> {
     if !cfg!(debug_assertions) {
         return Err(format!(
             "O Local Bot não encontrou o cérebro: {} {}, {} {}",
-            node.display(), if node.exists() { "found" } else { "not found" },
-            script.display(), if script.exists() { "found" } else { "not found" },
+            node.display(), if node.exists() { "encontrado" } else { "não encontrado" },
+            script.display(), if script.exists() { "encontrado" } else { "não encontrado" },
         ));
     }
     let dir = std::env::var("LOCALBOT_BRAIN_DIR")
