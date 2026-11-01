@@ -102,12 +102,14 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
   const stop = () => brain.request("chat.stop", { botId: bot.id });
   // While the bot works: with something typed the button sends, empty it stops.
   const stops = thinking && !canSend;
+  // Only the newest bot message keeps animating (each animation redraws 30×/s).
+  const lastBot = [...messages].reverse().find((m) => m.role === "assistant");
 
   return (
     <section className={`chat ${dropping ? "dropping" : ""}`}>
       <header className="chat-head">
         <div className="chat-who">
-          <Avatar bot={bot} size={26} working={thinking} />
+          <Avatar bot={bot} size={26} working={thinking} failed={!!messages[messages.length - 1]?.error} />
           <div>
             <div className="title">{bot.name}</div>
             <div className="subtitle">{bot.model}</div>
@@ -119,7 +121,7 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
         </div>
       </header>
       <div className="messages">
-        {messages.map((m) => <Bubble key={m.id} m={m} bot={bot} />)}
+        {messages.map((m) => <Bubble key={m.id} m={m} bot={bot} still={m !== lastBot} />)}
         {thinking && messages[messages.length - 1]?.role !== "assistant" && (
           <div className="bot-msg"><Avatar bot={bot} size={22} working /><div className="typing-dots"><i /><i /><i /></div></div>
         )}
@@ -161,7 +163,7 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
   );
 }
 
-function Bubble({ m, bot }: { m: Message; bot: Bot }) {
+function Bubble({ m, bot, still }: { m: Message; bot: Bot; still: boolean }) {
   const [details, setDetails] = useState(false);
   if (m.role === "activity") {
     return (
@@ -185,7 +187,7 @@ function Bubble({ m, bot }: { m: Message; bot: Bot }) {
   }
   return (
     <div className={`bot-msg ${m.error ? "failed" : ""}`}>
-      <Avatar bot={bot} size={22} />
+      <Avatar bot={bot} size={22} failed={!!m.error} still={still} />
       <div className="bot-body">
       {m.text ? <Markdown text={m.text} /> : !m.error && !m.files?.length ? <div className="typing-dots"><i /><i /><i /></div> : null}
       {m.files?.length ? <Files botId={m.botId} files={m.files} /> : null}

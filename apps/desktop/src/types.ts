@@ -1,3 +1,8 @@
+/** Face parts plus colors, so the shell can draw (and animate) it. */
+export interface Face {
+  color: string; eyes: string; mouth: string; accessory: string; shape?: string; fill: string; deep: string;
+}
+
 export interface Bot {
   id: string;
   name: string;
@@ -7,6 +12,7 @@ export interface Bot {
   model: string;
   /** The brain's flat SVG face for this bot. */
   avatar?: string;
+  face?: Face;
   status?: "thinking" | "idle";
   /** Devices it can use: "owner" is its own. */
   computers?: { computerId: string; role: "owner" | "guest" }[];
