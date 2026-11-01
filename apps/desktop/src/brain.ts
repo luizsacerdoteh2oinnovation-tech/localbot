@@ -22,7 +22,7 @@ class BrainClient {
     this.started ??= (async () => {
       await listen<string>("brain-line", ({ payload }) => this.receive(payload));
       await listen<number | null>("brain-exit", ({ payload }) => {
-        for (const p of this.pending.values()) p.reject(new Error("The brain stopped"));
+        for (const p of this.pending.values()) p.reject(new Error("O cérebro parou"));
         this.pending.clear();
         this.emit("brain.exit", payload);
       });

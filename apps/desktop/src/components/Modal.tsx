@@ -6,7 +6,7 @@ export function Modal({ title, onClose, children, wide }: { title: string; onClo
       <div className={`modal ${wide ? "wide" : ""}`}>
         <div className="modal-head">
           <span>{title}</span>
-          <button className="icon" onClick={onClose} aria-label="Close">×</button>
+          <button className="icon" onClick={onClose} aria-label="Fechar">×</button>
         </div>
         {children}
       </div>

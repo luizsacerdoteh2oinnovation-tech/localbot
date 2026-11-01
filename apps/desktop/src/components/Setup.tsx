@@ -26,22 +26,22 @@ export function Setup({ status, onDone }: { status: ProviderStatus; onDone: () =
   return (
     <div className="setup">
       <div className="setup-card">
-        <h1>Welcome to Local Bot</h1>
-        <p className="muted">Bots think with an AI model. Pick a provider and paste its API key; it’s stored encrypted for your Windows user ({status.secretStore}).</p>
-        <label>Provider</label>
+        <h1>Boas-vindas ao Local Bot</h1>
+        <p className="muted">Os bots pensam com um modelo de IA. Escolha um provedor e cole a chave de API; ela fica criptografada para o seu usuário do Windows ({status.secretStore}).</p>
+        <label>Provedor</label>
         <select value={preset} onChange={(e) => setPreset(e.target.value)}>
           {status.presets.filter((p) => p.id !== "custom").map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
         </select>
         {!chosen?.keyless && (
           <>
-            <label>API key</label>
-            <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="Paste your key" autoFocus />
-            {chosen?.keyURL && <a className="link" href={chosen.keyURL} target="_blank" rel="noreferrer">Get a key</a>}
+            <label>Chave de API</label>
+            <input type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder="Cole sua chave" autoFocus />
+            {chosen?.keyURL && <a className="link" href={chosen.keyURL} target="_blank" rel="noreferrer">Obter uma chave</a>}
           </>
         )}
         {error && <div className="chat-error">{error}</div>}
         <button className="primary" disabled={busy || (!chosen?.keyless && !key.trim())} onClick={save}>
-          {busy ? "Saving…" : "Continue"}
+          {busy ? "Salvando…" : "Continuar"}
         </button>
       </div>
     </div>

@@ -23,7 +23,7 @@ struct Brain {
 /// checkout runs the TypeScript sources through tsx (`LOCALBOT_BRAIN_DIR`
 /// overrides where they are).
 fn launch_command(app: &AppHandle) -> Result<Command, String> {
-    let res = app.path().resource_dir().map_err(|e| format!("No resource folder: {e}"))?;
+    let res = app.path().resource_dir().map_err(|e| format!("Pasta de recursos não encontrada: {e}"))?;
     // Node can't load an ES module from a verbatim (\\?\C:\…) path.
     let res = match res.to_str().and_then(|s| s.strip_prefix(r"\\?\")) {
         Some(plain) if !plain.starts_with("UNC") => PathBuf::from(plain),
@@ -40,7 +40,7 @@ fn launch_command(app: &AppHandle) -> Result<Command, String> {
     // falling back to a source checkout that isn't there.
     if !cfg!(debug_assertions) {
         return Err(format!(
-            "Local Bot is missing its brain: {} {}, {} {}",
+            "O Local Bot não encontrou o cérebro: {} {}, {} {}",
             node.display(), if node.exists() { "found" } else { "not found" },
             script.display(), if script.exists() { "found" } else { "not found" },
         ));
@@ -73,7 +73,7 @@ fn start_brain(app: &AppHandle) -> Result<(), String> {
     }
 
     *app.state::<Brain>().command.lock().unwrap() = format!("{:?}", cmd);
-    let mut child = cmd.spawn().map_err(|e| format!("Couldn’t start the brain ({:?}): {e}", cmd))?;
+    let mut child = cmd.spawn().map_err(|e| format!("Não foi possível iniciar o cérebro ({:?}): {e}", cmd))?;
     let stdout = child.stdout.take().ok_or("no stdout")?;
     *app.state::<Brain>().stdin.lock().unwrap() = child.stdin.take();
 
@@ -100,7 +100,7 @@ fn start_brain(app: &AppHandle) -> Result<(), String> {
 #[tauri::command]
 fn brain_send(line: String, brain: State<Brain>) -> Result<(), String> {
     let mut guard = brain.stdin.lock().unwrap();
-    let stdin = guard.as_mut().ok_or("The brain isn’t running")?;
+    let stdin = guard.as_mut().ok_or("O cérebro não está em execução")?;
     stdin
         .write_all(line.trim_end().as_bytes())
         .and_then(|_| stdin.write_all(b"\n"))

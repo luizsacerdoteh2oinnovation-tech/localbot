@@ -10,7 +10,7 @@ import type { Computer } from "../types";
 export function Screen({ computer, controlling }: { computer: Computer; controlling: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const rfb = useRef<RFB | null>(null);
-  const [status, setStatus] = useState("Connecting…");
+  const [status, setStatus] = useState("Conectando…");
   const display = computer.display as { kind: string; url?: string; password?: string };
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export function Screen({ computer, controlling }: { computer: Computer; controll
       r.addEventListener("connect", () => setStatus(""));
       // The device may still be booting, or was restarted: keep trying.
       r.addEventListener("disconnect", () => {
-        setStatus("Reconnecting…");
+        setStatus("Reconectando…");
         if (!stopped) retry = setTimeout(connect, 2500);
       });
       rfb.current = r;
@@ -50,9 +50,9 @@ export function Screen({ computer, controlling }: { computer: Computer; controll
   }, [controlling]);
 
   if (computer.state !== "running") {
-    return <div className="screen-empty">Device is {computer.state === "creating" ? "being created…" : "off"}</div>;
+    return <div className="screen-empty">Dispositivo {computer.state === "creating" ? "sendo criado…" : "desligado"}</div>;
   }
-  if (display.kind !== "vnc") return <div className="screen-empty">This device’s screen isn’t available here yet</div>;
+  if (display.kind !== "vnc") return <div className="screen-empty">A tela deste dispositivo ainda não está disponível aqui</div>;
   return (
     <div className={`screen ${controlling ? "controlling" : ""}`}>
       <div ref={box} className="screen-canvas" />

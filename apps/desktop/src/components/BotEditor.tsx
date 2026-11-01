@@ -47,38 +47,38 @@ export function BotEditor({ bot, computers, providers, onClose, onDeleted }: {
   };
 
   return (
-    <Modal title={`${bot.name} settings`} onClose={onClose} wide>
-      <label>Name</label>
+    <Modal title={`Configurações de ${bot.name}`} onClose={onClose} wide>
+      <label>Nome</label>
       <input value={name} onChange={(e) => setName(e.target.value)} />
-      <label>Role</label>
-      <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="What it does, in a few words" />
-      <label>Instructions</label>
-      <textarea rows={5} value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="How it should work, what to avoid…" />
+      <label>Função</label>
+      <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="O que ele faz, em poucas palavras" />
+      <label>Instruções</label>
+      <textarea rows={5} value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="Como ele deve trabalhar, o que evitar…" />
       <div className="row2">
         <div>
-          <label>Provider</label>
+          <label>Provedor</label>
           <select value={provider} onChange={(e) => setProvider(e.target.value)}>
             {providers.providers.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
           </select>
         </div>
         <div>
-          <label>Model</label>
+          <label>Modelo</label>
           <input list="models" value={model} onChange={(e) => setModel(e.target.value)} />
           <datalist id="models">{models.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</datalist>
         </div>
       </div>
-      <label>Device</label>
+      <label>Dispositivo</label>
       <select value={device} onChange={(e) => setDevice(e.target.value)}>
-        <option value="">None</option>
+        <option value="">Nenhum</option>
         {computers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
       </select>
       {error && <div className="chat-error">{error}</div>}
       <div className="modal-actions">
         {confirming
-          ? <button className="pill danger" onClick={remove}>Delete {bot.name}, its chat and memory</button>
-          : <button className="pill" onClick={() => setConfirming(true)}>Delete bot…</button>}
+          ? <button className="pill danger" onClick={remove}>Excluir {bot.name}, o chat e a memória</button>
+          : <button className="pill" onClick={() => setConfirming(true)}>Excluir bot…</button>}
         <span className="spacer" />
-        <button className="primary" disabled={!name.trim() || !model.trim()} onClick={save}>Save</button>
+        <button className="primary" disabled={!name.trim() || !model.trim()} onClick={save}>Salvar</button>
       </div>
     </Modal>
   );

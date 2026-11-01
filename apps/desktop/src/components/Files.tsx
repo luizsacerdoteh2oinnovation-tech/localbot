@@ -35,7 +35,7 @@ function FileCard({ botId, file }: { botId: string; file: Attachment }) {
           <span className="file-size">{error ?? size(file.size)}</span>
         </span>
       </button>
-      <button className="icon" title="Show in folder" onClick={() => run(revealItemInDir)}>⋯</button>
+      <button className="icon" title="Mostrar na pasta" onClick={() => run(revealItemInDir)}>⋯</button>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { Setup } from "./components/Setup";
 import { Modal } from "./components/Modal";
 import { BotEditor } from "./components/BotEditor";
 import { Settings } from "./components/Settings";
+import { stateLabel } from "./components/Sidebar";
 
 export function App() {
   const [bots, setBots] = useState<Bot[]>([]);
@@ -45,7 +46,7 @@ export function App() {
           return next;
         })),
       brain.on("brain.exit", (code: number | null) =>
-        setBrainError(brain.startError ? `The brain couldn’t start: ${brain.startError}` : `The brain stopped (exit code ${code ?? "unknown"}).`)),
+        setBrainError(brain.startError ? `O cérebro não conseguiu iniciar: ${brain.startError}` : `O cérebro parou (código de saída ${code ?? "desconhecido"}).`)),
     ];
     // Devices change outside the app too (docker): poll their state.
     const poll = setInterval(() => void refreshComputers().catch(() => {}), 5000);
@@ -68,7 +69,7 @@ export function App() {
   }, [selection, computers, bot]);
 
   if (brainError) return <BrainError message={brainError} onRetry={() => { setBrainError(null); void brain.restart().then(load); }} />;
-  if (!providers) return <div className="setup"><div className="muted">Starting…</div></div>;
+  if (!providers) return <div className="setup"><div className="muted">Iniciando…</div></div>;
   if (!providers.providers.some((p) => p.configured)) return <Setup status={providers} onDone={() => void refreshProviders()} />;
 
   return (
@@ -79,25 +80,25 @@ export function App() {
       <main className="stage">
         <header className="stage-head">
           <div>
-            <div className="title">{device ? device.name : bot ? `${bot.name}’s device` : "Local Bot"}</div>
-            <div className="subtitle">{device ? `${device.os === "linux" ? "Linux" : device.os} · ${device.state}` : bot ? "No device yet" : ""}</div>
+            <div className="title">{device ? device.name : bot ? `Dispositivo de ${bot.name}` : "Local Bot"}</div>
+            <div className="subtitle">{device ? `${device.os === "linux" ? "Linux" : device.os} · ${stateLabel(device.state)}` : bot ? "Nenhum dispositivo ainda" : ""}</div>
           </div>
           {device && (
             <div className="actions">
               {device.state === "running" && (
                 <button className={`pill ${controlling ? "active" : ""}`} onClick={() => setControlling((c) => !c)}>
-                  {controlling ? "Give back control" : "Take control"}
+                  {controlling ? "Devolver o controle" : "Assumir o controle"}
                 </button>
               )}
               {device.state === "running"
-                ? <button className="pill" onClick={() => brain.request("computers.stop", { id: device.id })}>Shut down</button>
-                : device.state === "stopped" && <button className="pill" onClick={() => brain.request("computers.start", { id: device.id })}>Start</button>}
+                ? <button className="pill" onClick={() => brain.request("computers.stop", { id: device.id })}>Desligar</button>
+                : device.state === "stopped" && <button className="pill" onClick={() => brain.request("computers.start", { id: device.id })}>Ligar</button>}
             </div>
           )}
         </header>
         <div className="stage-body">
           {device ? <Screen computer={device} controlling={controlling} />
-            : <div className="screen-empty">{bot ? "This bot has no device. Add one in Devices and give the bot access." : "Create a bot to get started."}</div>}
+            : <div className="screen-empty">{bot ? "Este bot não tem dispositivo. Adicione um em Dispositivos e dê acesso ao bot." : "Crie um bot para começar."}</div>}
         </div>
       </main>
       {bot && <Chat bot={bot} thinking={thinking.has(bot.id)} onEdit={() => setDialog("editBot")} />}
@@ -127,18 +128,18 @@ function NewBot({ computers, onClose, onCreated }: { computers: Computer[]; onCl
     }
   };
   return (
-    <Modal title="New bot" onClose={onClose}>
-      <label>Name</label>
-      <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="e.g. Ninja" />
-      <label>Role</label>
-      <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="What it does, in a few words" />
-      <label>Device</label>
+    <Modal title="Novo bot" onClose={onClose}>
+      <label>Nome</label>
+      <input value={name} onChange={(e) => setName(e.target.value)} autoFocus placeholder="ex.: Ninja" />
+      <label>Função</label>
+      <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="O que ele faz, em poucas palavras" />
+      <label>Dispositivo</label>
       <select value={device} onChange={(e) => setDevice(e.target.value)}>
-        <option value="">None for now</option>
+        <option value="">Nenhum por enquanto</option>
         {computers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
       </select>
       {error && <div className="chat-error">{error}</div>}
-      <button className="primary" disabled={!name.trim()} onClick={create}>Create bot</button>
+      <button className="primary" disabled={!name.trim()} onClick={create}>Criar bot</button>
     </Modal>
   );
 }
@@ -156,13 +157,13 @@ function NewDevice({ onClose, onCreated }: { onClose: () => void; onCreated: (id
 
   const create = async () => {
     const setupId = crypto.randomUUID();
-    const steps: Record<string, string> = { download: "Downloading the image", start: "Starting", controls: "Installing controls", screen: "Opening the screen" };
+    const steps: Record<string, string> = { download: "Baixando a imagem", start: "Iniciando", controls: "Instalando os controles", screen: "Abrindo a tela" };
     const off = brain.on("device.setup", (e: { setupId: string; step: string; status: string; fraction?: number }) => {
       if (e.setupId !== setupId || e.status !== "active") return;
       setStep(`${steps[e.step] ?? e.step}…${e.fraction != null ? ` ${Math.round(e.fraction * 100)}%` : ""}`);
     });
     setError(null);
-    setStep("Starting…");
+    setStep("Iniciando…");
     try {
       const { id } = await brain.request<{ id: string }>("computers.create", { kind: "docker", name: name.trim(), setupId });
       onCreated(id);
@@ -176,16 +177,16 @@ function NewDevice({ onClose, onCreated }: { onClose: () => void; onCreated: (id
   };
 
   return (
-    <Modal title="New Linux device" onClose={onClose}>
-      <p className="muted">A Linux desktop in Docker that your bots can use. The first one downloads its image (~1–2 GB).</p>
-      {req?.docker === "missing" && <div className="chat-error">Docker Desktop isn’t installed. Install it from docker.com, then come back.</div>}
-      {req?.docker === "stopped" && <div className="chat-error">Docker Desktop isn’t running. Open it and try again.</div>}
-      <label>Name</label>
+    <Modal title="Novo dispositivo Linux" onClose={onClose}>
+      <p className="muted">Uma área de trabalho Linux no Docker que seus bots podem usar. O primeiro baixa a imagem (~1–2 GB).</p>
+      {req?.docker === "missing" && <div className="chat-error">O Docker Desktop não está instalado. Instale em docker.com e volte aqui.</div>}
+      {req?.docker === "stopped" && <div className="chat-error">O Docker Desktop não está em execução. Abra-o e tente de novo.</div>}
+      <label>Nome</label>
       <input value={name} onChange={(e) => setName(e.target.value)} />
       {step && <div className="muted">{step}</div>}
       {error && <div className="chat-error">{error}</div>}
       <button className="primary" disabled={!name.trim() || !!step || req?.docker !== "running"} onClick={create}>
-        {step ? "Creating…" : "Create device"}
+        {step ? "Criando…" : "Criar dispositivo"}
       </button>
     </Modal>
   );
@@ -200,13 +201,13 @@ function BrainError({ message, onRetry }: { message: string; onRetry: () => void
   return (
     <div className="setup">
       <div className="setup-card wide">
-        <h1>Something went wrong</h1>
+        <h1>Algo deu errado</h1>
         <p className="muted">{message}</p>
         {details && <pre className="detail selectable">{details}</pre>}
         <div className="modal-actions">
-          <button className="pill" onClick={() => navigator.clipboard.writeText(`${message}\n\n${details}`)}>Copy details</button>
+          <button className="pill" onClick={() => navigator.clipboard.writeText(`${message}\n\n${details}`)}>Copiar detalhes</button>
           <span className="spacer" />
-          <button className="primary" onClick={onRetry}>Try again</button>
+          <button className="primary" onClick={onRetry}>Tentar de novo</button>
         </div>
       </div>
     </div>

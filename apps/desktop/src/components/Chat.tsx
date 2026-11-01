@@ -1,4 +1,5 @@
 import { Avatar } from "./Avatar";
+import { pt } from "../i18n";
 import { useEffect, useRef, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -116,8 +117,8 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
           </div>
         </div>
         <div className="actions">
-          {thinking && <button className="pill" onClick={stop}>Stop</button>}
-          <button className="icon" onClick={onEdit} title={`${bot.name} settings`}>⚙</button>
+          {thinking && <button className="pill" onClick={stop}>Parar</button>}
+          <button className="icon" onClick={onEdit} title={`Configurações de ${bot.name}`}>⚙</button>
         </div>
       </header>
       <div className="messages">
@@ -134,16 +135,16 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
             {pending.map((p) => (
               <span key={p} className="chip" title={p}>
                 {fileName(p)}
-                <button className="icon" onClick={() => setPending((list) => list.filter((x) => x !== p))} aria-label="Remove">×</button>
+                <button className="icon" onClick={() => setPending((list) => list.filter((x) => x !== p))} aria-label="Remover">×</button>
               </span>
             ))}
           </div>
         )}
         <div className="composer-row">
-          <button className="icon add" onClick={pick} title="Add files or images">+</button>
+          <button className="icon add" onClick={pick} title="Adicionar arquivos ou imagens">+</button>
           <textarea
             value={draft}
-            placeholder={`Message ${bot.name}…`}
+            placeholder={`Mensagem para ${bot.name}…`}
             rows={1}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
@@ -154,7 +155,7 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
             }}
           />
           <button className="send" disabled={!canSend && !thinking} onClick={stops ? stop : send}
-            title={stops ? "Stop the current task" : thinking ? `Send now; ${bot.name} reads it at its next step` : "Send"}>
+            title={stops ? "Parar a tarefa atual" : thinking ? `Enviar agora; ${bot.name} lê no próximo passo` : "Enviar"}>
             {stops ? "■" : "↑"}
           </button>
         </div>
@@ -168,20 +169,20 @@ function Bubble({ m, bot, still }: { m: Message; bot: Bot; still: boolean }) {
   if (m.role === "activity") {
     return (
       <div className={`activity ${m.error ? "failed" : ""}`} onClick={() => m.detail && setDetails((d) => !d)}>
-        {m.error ? `${m.text} — ${m.error}` : m.text}
+        {m.error ? `${pt(m.text)} — ${pt(m.error)}` : pt(m.text)}
         {details && m.detail && <pre className="detail">{m.detail}</pre>}
       </div>
     );
   }
   if (m.connect) return <ConnectCard m={m} bot={bot} />;
   if (m.role === "user") {
-    const label = m.routine ? `Routine · ${m.routine.name}` : m.from ? `From ${m.from.name}` : m.notice ? "Local Bot" : null;
+    const label = m.routine ? `Rotina · ${m.routine.name}` : m.from ? `De ${m.from.name}` : m.notice ? "Local Bot" : null;
     return (
       <div className="user-msg">
         {label && <div className="label">{label}</div>}
         {m.files?.length ? <Files botId={m.botId} files={m.files} /> : null}
         {m.text !== "(sent files)" && <div className={`bubble user ${m.queued ? "queued" : ""}`}>{m.text}</div>}
-        {m.queued && <div className="label">Queued · {bot.name} reads it at the next step</div>}
+        {m.queued && <div className="label">Na fila · {bot.name} lê no próximo passo</div>}
       </div>
     );
   }
@@ -193,7 +194,7 @@ function Bubble({ m, bot, still }: { m: Message; bot: Bot; still: boolean }) {
       {m.files?.length ? <Files botId={m.botId} files={m.files} /> : null}
       {m.error && (
         <div className="error" onClick={() => setDetails((d) => !d)}>
-          {m.error}{m.detail ? (details ? " ▾" : " ▸") : ""}
+          {pt(m.error)}{m.detail ? (details ? " ▾" : " ▸") : ""}
           {details && m.detail && <pre className="detail">{m.detail}</pre>}
         </div>
       )}
@@ -220,16 +221,16 @@ function ConnectCard({ m, bot }: { m: Message; bot: Bot }) {
   };
   return (
     <div className="connect-card">
-      <div className="title">{c.mode === "allow" ? `Let ${bot.name} use ${c.name}?` : `Connect ${c.name}`}</div>
+      <div className="title">{c.mode === "allow" ? `Deixar ${bot.name} usar ${c.name}?` : `Conectar ${c.name}`}</div>
       <div className="subtitle">{c.reason || c.description}</div>
       {error && <div className="chat-error">{error}</div>}
       {c.state === "pending" ? (
         <div className="actions">
-          <button className="pill" onClick={() => brain.request("connectors.dismiss", { messageId: m.id })}>Not now</button>
-          <button className="pill active" onClick={act}>{c.mode === "allow" ? "Allow" : "Connect"}</button>
+          <button className="pill" onClick={() => brain.request("connectors.dismiss", { messageId: m.id })}>Agora não</button>
+          <button className="pill active" onClick={act}>{c.mode === "allow" ? "Permitir" : "Conectar"}</button>
         </div>
       ) : (
-        <div className="subtitle">{c.state === "connected" ? "Connected ✓" : "Dismissed"}</div>
+        <div className="subtitle">{c.state === "connected" ? "Conectado ✓" : "Dispensado"}</div>
       )}
     </div>
   );

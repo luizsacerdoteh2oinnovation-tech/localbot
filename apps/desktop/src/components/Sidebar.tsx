@@ -18,12 +18,12 @@ export function Sidebar({ bots, computers, thinking, selection, onSelect, onNewB
     <nav className="sidebar">
       <div className="section-head">
         <span>BOTS</span>
-        <button className="icon" onClick={onNewBot} title="New bot">+</button>
+        <button className="icon" onClick={onNewBot} title="Novo bot">+</button>
       </div>
       {bots.length === 0 && (
         <button className="row" onClick={onNewBot}>
           <span className="tile dashed">+</span>
-          <span className="row-sub create">Create bot</span>
+          <span className="row-sub create">Criar bot</span>
         </button>
       )}
       {bots.map((b) => (
@@ -32,15 +32,15 @@ export function Sidebar({ bots, computers, thinking, selection, onSelect, onNewB
           <Avatar bot={b} size={28} working={thinking.has(b.id)} />
           <span className="row-text">
             <span className="row-title">{b.name}</span>
-            <span className="row-sub">{thinking.has(b.id) ? "Working…" : b.role || "Bot"}</span>
+            <span className="row-sub">{thinking.has(b.id) ? "Trabalhando…" : b.role || "Bot"}</span>
           </span>
         </button>
       ))}
       <div className="section-head">
-        <span>DEVICES</span>
-        <button className="icon" onClick={onNewDevice} title="Add device">+</button>
+        <span>DISPOSITIVOS</span>
+        <button className="icon" onClick={onNewDevice} title="Adicionar dispositivo">+</button>
       </div>
-      {computers.length === 0 && <div className="empty">No devices yet</div>}
+      {computers.length === 0 && <div className="empty">Nenhum dispositivo ainda</div>}
       {computers.map((c) => (
         <button key={c.id} className={`row ${selection?.kind === "device" && selection.id === c.id ? "selected" : ""}`}
           onClick={() => onSelect({ kind: "device", id: c.id })}>
@@ -52,10 +52,10 @@ export function Sidebar({ bots, computers, thinking, selection, onSelect, onNewB
           <span className={`dot ${c.state}`} />
         </button>
       ))}
-      <button className="settings-button" onClick={onSettings} title="Settings">⚙ Settings</button>
+      <button className="settings-button" onClick={onSettings} title="Configurações">⚙ Configurações</button>
     </nav>
   );
 }
 
-const stateLabel = (s: string) =>
-  ({ running: "On", stopped: "Off", starting: "Starting…", stopping: "Shutting down…", creating: "Being created…" } as Record<string, string>)[s] ?? "Error";
+export const stateLabel = (s: string) =>
+  ({ running: "Ligado", stopped: "Desligado", starting: "Iniciando…", stopping: "Desligando…", creating: "Sendo criado…" } as Record<string, string>)[s] ?? "Erro";
