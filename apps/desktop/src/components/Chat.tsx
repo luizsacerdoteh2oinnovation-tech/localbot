@@ -73,7 +73,8 @@ export function Chat({ bot, thinking, onEdit }: { bot: Bot; thinking: boolean; o
     return () => { void off.then((f) => f()); };
   }, []);
 
-  useEffect(() => end.current?.scrollIntoView({ block: "end" }), [messages]);
+  // Block body: newer WebView2 returns a Promise from scrollIntoView, which React would take as a cleanup.
+  useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [messages]);
 
   const add = (paths: string[]) => setPending((p) => [...p, ...paths.filter((x) => !p.includes(x))].slice(0, 10));
 
